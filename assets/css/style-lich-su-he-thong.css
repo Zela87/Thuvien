@@ -1,52 +1,95 @@
+/* Style riêng cho trang Lịch sử hệ thống */
 .history-card {
     background: white;
-    padding: 20px;
+    padding: 25px;
     border-radius: 10px;
     box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+    margin-bottom: 25px;
     border-top: 4px solid var(--primary-color);
 }
 
-/* Tab System */
+/* Tab Header */
 .tab-container {
     display: flex;
-    border-bottom: 2px solid #eaecf4;
+    gap: 5px;
+    border-bottom: 2px solid #e3e6f0;
     margin-bottom: 20px;
-    gap: 10px;
 }
 
 .tab-btn {
     padding: 12px 25px;
     border: none;
     background: none;
-    cursor: pointer;
-    font-weight: bold;
+    font-weight: 700;
     color: #858796;
+    cursor: pointer;
     transition: 0.3s;
-    border-bottom: 3px solid transparent;
+    border-radius: 5px 5px 0 0;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.tab-btn:hover {
+    background: #f8f9fc;
+    color: var(--primary-color);
 }
 
 .tab-btn.active {
     color: var(--primary-color);
-    border-bottom-color: var(--primary-color);
+    border-bottom: 3px solid var(--primary-color);
+    background: #f8f9fc;
 }
 
-.tab-content { display: none; }
-.tab-content.active { display: block; animation: fadeIn 0.5s; }
+/* Tab Content */
+.tab-content {
+    display: none;
+    animation: fadeIn 0.4s;
+}
 
-/* Table Styling */
-.table-responsive { width: 100%; overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-th { background: #f8f9fc; color: #4e73df; padding: 15px; text-align: left; font-size: 0.85rem; text-transform: uppercase; }
-td { padding: 15px; border-bottom: 1px solid #eaecf4; font-size: 0.9rem; color: #5a5c69; }
+.tab-content.active {
+    display: block;
+}
 
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Table Style */
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.history-table th {
+    background: #f8f9fc;
+    color: var(--primary-color);
+    font-weight: bold;
+    font-size: 0.8rem;
+    padding: 15px;
+    text-transform: uppercase;
+    text-align: left;
+    border-bottom: 2px solid #e3e6f0;
+}
+
+.history-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e3e6f0;
+    font-size: 0.9rem;
+    color: #5a5c69;
+}
+
+.history-table tr:hover {
+    background-color: #fcfdff;
+}
+
+/* Status Badges */
 .status-pill {
-    padding: 4px 12px;
+    padding: 4px 10px;
     border-radius: 20px;
     font-size: 0.75rem;
     font-weight: bold;
 }
-.pill-success { background: #e5f9f0; color: #1cc88a; }
-.pill-warning { background: #fff3cd; color: #f6c23e; }
-.pill-danger { background: #fdf2f2; color: #e74a3b; }
-
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.st-success { background: #e5f9f0; color: var(--success-color); }
+.st-danger { background: #fdf2f2; color: var(--danger-color); }
+.st-info { background: #eef2ff; color: var(--primary-color); }

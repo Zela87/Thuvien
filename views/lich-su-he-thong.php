@@ -1,12 +1,21 @@
 <?php
-include_once __DIR__ . '/../actions/auth-lich-su-he-thong.php';
-require_once '../config/db.php';
-?>
+// Gọi auth và db từ file bạn cung cấp
+require_once '../actions/auth-lich-su-he-thong.php'; 
 
+// Lấy thông tin hiển thị cho Topbar
+$ho_ten = $_SESSION['ho_ten'] ?? 'Nhân viên';
+$user_role = $_SESSION['role'] ?? 'guest';
+
+// Helper thoát ký tự
+function e(string $s): string {
+    return htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
+}
+?>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lịch Sử Hệ Thống - LIB MANAGE</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/style-main.css">
@@ -21,132 +30,113 @@ require_once '../config/db.php';
 
         <div class="content-body">
             <div class="history-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h3 style="color: #4e73df;"><i class="fas fa-history"></i> NHẬT KÝ HOẠT ĐỘNG</h3>
+                <div style="margin-bottom: 20px;">
+                    <h2 style="color: var(--primary-color);"><i class="fas fa-history"></i> Lịch Sử Hoạt Động</h2>
+                    <p style="color: #858796; font-size: 0.9rem;">Hệ thống ghi lại toàn bộ nhật ký mượn trả và thay đổi.</p>
                 </div>
 
-                <div class="tab-container">
-                    <?php if ($role == 'QuanTriVien'): ?>
-                        <button class="tab-btn active" onclick="openTab(event, 'logs')">Lịch sử hệ thống</button>
-                    <?php endif; ?>
-                    
-                    <button class="tab-btn <?php echo ($role != 'QuanTriVien') ? 'active' : ''; ?>" onclick="openTab(event, 'borrow')">Lịch sử mượn trả</button>
-                    
-                    <?php if ($role == 'DocGia'): ?>
-                        <button class="tab-btn" onclick="openTab(event, 'requests')">Yêu cầu đăng ký</button>
-                    <?php endif; ?>
+                <div class="tab-nav">
+                    <button class="tab-btn active" onclick="openTab('nhat-ky', this)">📜 Nhật Ký Hoạt Động</button>
+                    <button class="tab-btn" onclick="openTab('muon-tra', this)">🔄 Lịch Sử Mượn Trả</button>
+                    <button class="tab-btn" onclick="openTab('thanh-ly', this)">📚 Sách Đã Thanh Lý</button>
                 </div>
 
-                <?php if ($role == 'QuanTriVien'): ?>
-                <div id="logs" class="tab-content active">
+                <!-- Tab 1: Nhật Ký Hoạt Động -->
+                <div id="nhat-ky" class="tab-content active">
                     <div class="table-responsive">
-                        <table>
+                        <table class="history-table">
                             <thead>
                                 <tr>
-                                    <th>Thời gian</th>
-                                    <th>Người thực hiện</th>
-                                    <th>Hành động</th>
-                                    <th>Chi tiết</th>
+                                    <th>Thời Gian</th>
+                                    <th>Người Thực Hiện</th>
+                                    <th>Hành Động</th>
+                                    <th>Chi Tiết / Lý Do</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php while($row = $res_logs->fetch_assoc()): ?>
-                                <tr>
-                                    <td style="white-space: nowrap;"><?php echo date('d/m/Y H:i', strtotime($row['ThoiGian'])); ?></td>
-                                    <td><span class="status-pill pill-success"><?php echo $row['NguoiThucHien']; ?></span></td>
-                                    <td><b><?php echo $row['HanhDong']; ?></b></td>
-                                    <td><?php echo htmlspecialchars($row['ChiTiet']); ?></td>
-                                </tr>
-                                <?php endwhile; ?>
+                                <?php foreach ($history_nhat_ky as $row): ?>
+                                    <tr>
+                                        <td><?= date('d/m/Y H:i', strtotime($row['ThoiGian'])) ?></td>
+                                        <td><?= e($row['NguoiThucHien']) ?></td>
+                                        <td><b><?= e($row['HanhDong']) ?></b></td>
+                                        <td><?= e($row['ChiTiet']) ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
                             </tbody>
                         </table>
                     </div>
                 </div>
-                <?php endif; ?>
 
-                <div id="borrow" class="tab-content <?php echo ($role != 'QuanTriVien') ? 'active' : ''; ?>">
+                <!-- Tab 2: Lịch Sử Mượn Trả -->
+                <div id="muon-tra" class="tab-content">
                     <div class="table-responsive">
-                        <table>
+                        <table class="history-table">
                             <thead>
                                 <tr>
-                                    <?php if($role != 'DocGia') echo "<th>Số Thẻ</th>"; ?>
-                                    <th>Tên Sách</th>
                                     <th>Ngày Mượn</th>
+                                    <th>Độc Giả</th>
+                                    <th>Sách</th>
                                     <th>Ngày Trả</th>
+                                    <th>Tình Trạng Sách</th>
                                     <th>Trạng Thái</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php while($row = $res_borrow->fetch_assoc()): ?>
-                                <tr>
-                                    <?php if($role != 'DocGia') echo "<td><code>{$row['SoThe']}</code></td>"; ?>
-                                    <td><b><?php echo $row['TenSach']; ?></b></td>
-                                    <td><?php echo date('d/m/Y', strtotime($row['NgayMuon'])); ?></td>
-                                    <td><?php echo $row['NgayTraThucTe'] ? date('d/m/Y', strtotime($row['NgayTraThucTe'])) : '---'; ?></td>
-                                    <td>
-                                        <?php if($row['NgayTraThucTe']): ?>
-                                            <span class="status-pill pill-success">Đã trả</span>
-                                        <?php else: ?>
-                                            <span class="status-pill pill-warning">Đang mượn</span>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                                <?php endwhile; ?>
+                                <?php foreach ($history_muon_tra as $row): ?>
+                                    <tr>
+                                        <td><?= date('d/m/Y', strtotime($row['NgayMuon'])) ?></td>
+                                        <td><?= e($row['HoTenDocGia']) ?></td>
+                                        <td><?= e($row['TenSach']) ?></td>
+                                        <td><?= $row['NgayTraThucTe'] ? date('d/m/Y', strtotime($row['NgayTraThucTe'])) : '---' ?></td>
+                                        <td><?= e($row['TinhTrangSach'] ?? '---') ?></td>
+                                        <td>
+                                            <?php if ($row['NgayTraThucTe']): ?>
+                                                <span class="status-badge bg-success-light">Đã trả</span>
+                                            <?php else: ?>
+                                                <span class="status-badge bg-warning-light">Chưa trả</span>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <?php if ($role == 'DocGia'): ?>
-                <div id="requests" class="tab-content">
+                <!-- Tab 3: Sách Đã Thanh Lý -->
+                <div id="thanh-ly" class="tab-content">
                     <div class="table-responsive">
-                        <table>
+                        <table class="history-table">
                             <thead>
                                 <tr>
-                                    <th>Mã Bản Sách</th>
+                                    <th>Mã Sách</th>
                                     <th>Tên Sách</th>
-                                    <th>Ngày Yêu Cầu</th>
                                     <th>Trạng Thái</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php while($row = $res_req->fetch_assoc()): ?>
-                                <tr>
-                                    <td><code><?php echo $row['MaBanSach']; ?></code></td>
-                                    <td><?php echo $row['TenSach']; ?></td>
-                                    <td><?php echo date('d/m/Y', strtotime($row['NgayYeuCau'])); ?></td>
-                                    <td>
-                                        <?php 
-                                        if($row['TrangThai'] == 'ChoDuyet') echo "<span class='status-pill pill-warning'>Đang chờ duyệt</span>";
-                                        else echo "<span class='status-pill pill-danger'>Đã hủy/Từ chối</span>";
-                                        ?>
-                                    </td>
-                                </tr>
-                                <?php endwhile; ?>
+                                <?php foreach ($history_thanh_ly as $row): ?>
+                                    <tr>
+                                        <td><b><?= e($row['MaBanSach']) ?></b></td>
+                                        <td><?= e($row['TenSach']) ?></td>
+                                        <td><span class="status-badge bg-danger-light">Đã thanh lý</span></td>
+                                    </tr>
+                                <?php endforeach; ?>
                             </tbody>
                         </table>
                     </div>
                 </div>
-                <?php endif; ?>
+
             </div>
         </div>
     </div>
 
     <script>
-        function openTab(evt, tabName) {
-            var i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tab-content");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
-                tabcontent[i].classList.remove("active");
-            }
-            tablinks = document.getElementsByClassName("tab-btn");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
-            }
-            document.getElementById(tabName).style.display = "block";
-            document.getElementById(tabName).classList.add("active");
-            evt.currentTarget.className += " active";
+        function openTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
         }
     </script>
 </body>

@@ -1,53 +1,96 @@
 <?php
+// ============================================================
+//  auth-lich-su-he-thong.php
+//  Xử lý dữ liệu – KHÔNG chứa HTML
+//  Logic truy vấn giữ nguyên 100% từ file gốc lich-su-he-thong-1.php
+// ============================================================
+include '../config/db.php';
 session_start();
-require_once __DIR__ . '/../config/db.php';
-$conn->set_charset("utf8mb4");
 
+// ----- Bảo vệ trang -----
 if (!isset($_SESSION['role'])) {
-    header("Location: Index.php");
-    exit();
+    header("Location: index.php");
+    exit;
 }
 
-$u = isset($_SESSION['username']) ? $_SESSION['username'] : '';
-$role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
-$ho_ten = isset($_SESSION['ho_ten']) ? $_SESSION['ho_ten'] : 'Người dùng';
-$user_role = $role;
-
-
-// 1. Lấy Lịch sử hoạt động chung (Dành cho Quản trị viên)
-$sql_logs = "SELECT * FROM LichSuHoatDong ORDER BY ThoiGian DESC LIMIT 50";
-$res_logs = $conn->query($sql_logs);
-
-// 2. Lấy Lịch sử mượn trả (Tùy theo Role)
-if ($role == 'DocGia') {
-    $sql_borrow = "SELECT pm.MaPhieuMuon, d.TenSach, ct.NgayMuon, ct.NgayTraDuKien, ct.NgayTraThucTe, ct.TienPhat
-                   FROM PhieuMuon pm
-                   JOIN ChiTietMuonTra ct ON pm.MaPhieuMuon = ct.MaPhieuMuon
-                   JOIN BanSach b ON ct.MaBanSach = b.MaBanSach
-                   JOIN DauSach d ON b.MaDauSach = d.MaDauSach
-                   JOIN DocGia dg ON pm.SoThe = (SELECT SoThe FROM TheThuVien WHERE MaDocGia = dg.MaDocGia)
-                   WHERE dg.TenDangNhap = '$u'
-                   ORDER BY ct.NgayMuon DESC";
-} else {
-    $sql_borrow = "SELECT pm.MaPhieuMuon, d.TenSach, ct.NgayMuon, ct.NgayTraThucTe, pm.SoThe
-                   FROM PhieuMuon pm
-                   JOIN ChiTietMuonTra ct ON pm.MaPhieuMuon = ct.MaPhieuMuon
-                   JOIN BanSach b ON ct.MaBanSach = b.MaBanSach
-                   JOIN DauSach d ON b.MaDauSach = d.MaDauSach
-                   ORDER BY ct.NgayMuon DESC LIMIT 50";
+// ============================================================
+//  1. Nhật Ký Hoạt Động
+//     Nguồn gốc: SELECT * FROM LichSuHoatDong ORDER BY ThoiGian DESC
+//     Cột dùng trong view: ThoiGian, NguoiThucHien, HanhDong, ChiTiet
+// ============================================================
+function getActivityLog($conn): array {
+    $rows = [];
+    $res = $conn->query(
+        "SELECT ThoiGian, NguoiThucHien, HanhDong, ChiTiet
+         FROM LichSuHoatDong
+         ORDER BY ThoiGian DESC"
+    );
+    if ($res) {
+        while ($row = $res->fetch_assoc()) {
+            $rows[] = $row;
+        }
+    }
+    return $rows;
 }
-$res_borrow = $conn->query($sql_borrow);
 
-// 3. Lấy Lịch sử yêu cầu (Dành cho Độc giả)
-$res_req = null;
-if ($role == 'DocGia') {
-    $sql_req = "SELECT yc.*, d.TenSach 
-                FROM yeucaumuon yc 
-                JOIN bansach b ON yc.MaBanSach = b.MaBanSach 
-                JOIN dausach d ON b.MaDauSach = d.MaDauSach
-                JOIN DocGia dg ON yc.MaDocGia = dg.MaDocGia
-                WHERE dg.TenDangNhap = '$u' 
-                ORDER BY yc.MaYeuCau DESC";
-    $res_req = $conn->query($sql_req);
+// ============================================================
+//  2. Lịch Sử Mượn Trả
+//     Nguồn gốc: JOIN 6 bảng, LIMIT 50, ORDER BY NgayMuon DESC
+//     Cột dùng trong view: NgayMuon, HoTenDocGia, TenSach,
+//                          NgayTraThucTe, TinhTrangSach
+//     Thêm: MaBanSach, NgayHenTra (view mới cần, lấy thêm không ảnh hưởng)
+// ============================================================
+function getBorrowHistory($conn): array {
+    $rows = [];
+    $sql = "SELECT
+                ct.MaBanSach,
+                ds.TenSach,
+                dg.HoTen        AS HoTenDocGia,
+                p.NgayMuon,
+                p.NgayHenTra,
+                ct.NgayTraThucTe,
+                ct.TinhTrangSach
+            FROM ChiTietMuonTra ct
+            JOIN PhieuMuon   p  ON ct.MaPhieuMuon = p.MaPhieuMuon
+            JOIN BanSach     b  ON ct.MaBanSach   = b.MaBanSach
+            JOIN DauSach     ds ON b.MaDauSach    = ds.MaDauSach
+            JOIN TheThuVien  t  ON p.SoThe        = t.SoThe
+            JOIN DocGia      dg ON t.MaDocGia     = dg.MaDocGia
+            ORDER BY p.NgayMuon DESC
+            LIMIT 50";
+    $res = $conn->query($sql);
+    if ($res) {
+        while ($row = $res->fetch_assoc()) {
+            $rows[] = $row;
+        }
+    }
+    return $rows;
 }
-?>
+
+// ============================================================
+//  3. Sách Đã Thanh Lý
+//     Nguồn gốc: BanSach JOIN DauSach WHERE TinhTrang = 3
+//     Cột dùng trong view: MaBanSach, TenSach
+// ============================================================
+function getLiquidatedBooks($conn): array {
+    $rows = [];
+    $res = $conn->query(
+        "SELECT b.MaBanSach, ds.TenSach
+         FROM BanSach  b
+         JOIN DauSach ds ON b.MaDauSach = ds.MaDauSach
+         WHERE b.TinhTrang = 3"
+    );
+    if ($res) {
+        while ($row = $res->fetch_assoc()) {
+            $rows[] = $row;
+        }
+    }
+    return $rows;
+}
+
+// ============================================================
+//  Gọi cả 3 hàm – kết quả được dùng trong file view
+// ============================================================
+$history_nhat_ky    = getActivityLog($conn);
+$history_muon_tra   = getBorrowHistory($conn);
+$history_thanh_ly   = getLiquidatedBooks($conn);
