@@ -1,4 +1,4 @@
-?<?php
+<?php
 include '../actions/auth-muon-tra.php';
 require_once '../config/db.php';
 $conn->set_charset("utf8mb4");

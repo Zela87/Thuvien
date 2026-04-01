@@ -6,6 +6,7 @@
         <?php if ($user_role != 'guest'): ?>
             <?php if ($user_role == 'QuanTriVien' || $user_role == 'ThuThu'): ?>
                 <div class="sidebar-section">Lưu thông</div>
+                <a href="index.php" class="nav-item active"><i class="fas fa-search"></i><span>Tra Cứu Sách</span></a>
                 <a href="muon-tra-sach.php" class="nav-item"><i class="fas fa-plus-circle"></i><span>Mượn Sách</span></a>
                 <a href="quan-ly-phieu-muon.php" class="nav-item"><i class="fas fa-list-alt"></i><span>Phiếu Mượn</span></a>
                 <a href="quan-ly-doc-gia.php" class="nav-item"><i class="fas fa-users"></i><span>Độc Giả</span></a>
@@ -17,6 +18,7 @@
                 <div class="sidebar-section">Kho sách</div>
                 <a href="quan-ly-sach.php" class="nav-item"><i class="fas fa-book"></i><span>Sách</span></a>
                 <a href="quan-ly-tac-gia.php" class="nav-item"><i class="fas fa-feather"></i><span>Tác Giả</span></a>
+                <a href="quan-ly-nha-xuat-ban.php" class="nav-item"><i class="fas fa-building"></i><span>Nhà Xuất Bản</span></a>
                 <a href="thanh-ly-sach.php" class="nav-item"><i class="fas fa-trash-alt"></i><span>Thanh Lý</span></a>
 
                 <div class="sidebar-section">Hệ thống</div>
@@ -40,6 +42,6 @@
         <?php else: ?>
             <div class="sidebar-section">Khách</div>
             <a href="Login.php" class="nav-item"><i class="fas fa-sign-in-alt"></i><span>Đăng Nhập</span></a>
-            <a href="index.php" class="nav-item active"><i class="fas fa-search"></i><span>Tra Cứu Sách</span></a>
+            <!-- <a href="index.php" class="nav-item active"><i class="fas fa-search"></i><span>Tra Cứu Sách</span></a> -->
         <?php endif; ?>
     </div>

@@ -45,6 +45,6 @@ if(isset($_POST['toggle_status'])){
     $new_status = $_POST['current_status'] == 1 ? 0 : 1;
     $conn->query("UPDATE TaiKhoan SET TrangThai = $new_status WHERE TenDangNhap = '$u'");
     $_SESSION['msg'] = "success|Cập nhật trạng thái thành công!";
-    header("Location: ../pages/quan-ly-nguoi-dung.php"); exit();
+    header("Location: ../views/quan-ly-nguoi-dung.php"); exit();
 }
 ?>

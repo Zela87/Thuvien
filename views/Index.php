@@ -67,7 +67,7 @@ $conn->set_charset("utf8mb4");
                         $count = $row['SachCon'];
                         $statusClass = $count > 0 ? 'status-on' : 'status-off';
                         $statusText = $count > 0 ? "Còn $count cuốn" : "Hết sách";
-                        $imgPath = !empty($row['HinhAnh']) ? "../uploads/books/" . $row['HinhAnh'] : "";
+                        $imgPath = !empty($row['HinhAnh']) ? "../assets/images/" . $row['HinhAnh'] : "";
                 ?>
 
                         <div class="book-item">

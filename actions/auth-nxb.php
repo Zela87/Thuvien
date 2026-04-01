@@ -30,7 +30,7 @@ if (isset($_POST['save_nxb'])) {
     } else {
         $_SESSION['msg'] = "error|Lỗi: " . $conn->error;
     }
-    header("Location: ../pages/quan-ly-nha-xuat-ban.php"); exit();
+    header("Location: ../views/quan-ly-nha-xuat-ban.php"); exit();
 }
 
 // XỬ LÝ XÓA
