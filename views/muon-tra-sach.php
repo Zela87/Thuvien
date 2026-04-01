@@ -1,7 +1,17 @@
 <?php
+include_once __DIR__ . '/../actions/auth-index.php';
 include '../actions/auth-muon-tra.php';
 require_once '../config/db.php';
+$msg = $msg ?? '';
+$activeTab = isset($_GET['tab']) ? $_GET['tab'] : 'muon_truc_tiep';
+$step = $step ?? 1;
+$errors = $errors ?? [];
+
+/** @var array|null $card_data */
+/** @var array|null $book_data */
+
 $conn->set_charset("utf8mb4");
+
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -79,7 +89,8 @@ $conn->set_charset("utf8mb4");
                                 <a href="?tab=muon_truc_tiep" style="float:right; color: #155724; font-weight:bold;">[Đổi thẻ]</a>
                             </div>
                             <form method="POST" action="?tab=muon_truc_tiep">
-                                <input type="hidden" name="the" value="<?php echo htmlspecialchars($card_data['SoThe']); ?>">
+                                <input type="hidden" name="the" value="<?php echo htmlspecialchars($card_data['SoThe'] ?? ''); ?>">
+
                                 <div class="form-group">
                                     <label>Mã Vạch Sách</label>
                                     <input type="text" name="masach" required placeholder="Quét mã sách" autofocus>
@@ -103,8 +114,10 @@ $conn->set_charset("utf8mb4");
                                 <i class="fas fa-check-double"></i> Mọi thông tin hợp lệ!
                             </div>
                             <form method="POST" action="?tab=muon_truc_tiep">
-                                <input type="hidden" name="the_confirm"     value="<?php echo htmlspecialchars($card_data['SoThe']); ?>">
-                                <input type="hidden" name="masach_confirm"  value="<?php echo htmlspecialchars($book_data['MaBanSach']); ?>">
+                                <input type="hidden" name="the_confirm"     value="<?php echo htmlspecialchars($card_data['SoThe'] ?? ''); ?>">
+
+                                <input type="hidden" name="masach_confirm"  value="<?php echo htmlspecialchars($book_data['MaBanSach'] ?? ''); ?>">
+
                                 <input type="hidden" name="ngaytra_confirm" value="<?php echo htmlspecialchars($_POST['ngaytra']); ?>">
                                 <input type="hidden" name="ghi_chu_confirm" value="<?php echo htmlspecialchars($_POST['ghi_chu_muon']); ?>">
                                 <button type="submit" name="btn_confirm" class="btn btn-success">

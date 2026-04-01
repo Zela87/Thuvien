@@ -1,5 +1,8 @@
 <?php
 include_once '../actions/auth-register.php';
+
+$msg = $msg ?? '';
+
 ?>
 
 <!DOCTYPE html>

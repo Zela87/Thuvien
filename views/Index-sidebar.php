@@ -1,3 +1,8 @@
+<?php
+// Lấy thông tin người dùng từ session
+$ho_ten = isset($_SESSION['ho_ten']) ? $_SESSION['ho_ten'] : 'Khách';
+$user_role = isset($_SESSION['role']) ? $_SESSION['role'] : 'guest';
+?>
 <div class="sidebar">
         <div class="sidebar-header">
             <i class="fas fa-book-reader"></i> <span>LIB MANAGE</span>

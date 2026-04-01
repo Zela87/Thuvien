@@ -1,6 +1,7 @@
 <?php
 include_once __DIR__ . '/../actions/auth-index.php';
 require_once '../config/db.php';
+$user_role = $_SESSION['role'] ?? 'guest';
 $conn->set_charset("utf8mb4");
 
 // Kiểm tra quyền truy cập

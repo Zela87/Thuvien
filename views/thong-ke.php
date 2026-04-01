@@ -1,6 +1,11 @@
 <?php
 include_once __DIR__ . '/../actions/auth-index.php';
 require_once '../config/db.php';
+
+// Lấy thông tin người dùng từ session
+$ho_ten = isset($_SESSION['ho_ten']) ? $_SESSION['ho_ten'] : 'Khách';
+$user_role = isset($_SESSION['role']) ? $_SESSION['role'] : 'guest';
+
 $conn->set_charset("utf8mb4");
 
 // Kiểm tra quyền hạn
