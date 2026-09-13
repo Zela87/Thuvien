@@ -1,7 +1,7 @@
 # Quản Lý Thư Viện - Project Architecture Documentation
 
 ## Tổng quan (Project Overview)
-Dự án **Quản Lý Thư Viện (Library Management System)** là hệ thống web PHP thuần (không framework như Laravel) dùng để quản lý hoạt động thư viện: tra cứu/mượn/trả sách, quản lý độc giả/thẻ thư viện, sách/bản sao, phiếu mượn, báo cáo sự cố, thanh lý sách, và thống kê.
+Dự án **Quản Lý Thư Viện (Library Management System)** là hệ thống web dùng để quản lý hoạt động thư viện: tra cứu/mượn/trả sách, quản lý độc giả/thẻ thư viện, sách/bản sao, phiếu mượn, báo cáo sự cố, thanh lý sách, và thống kê.
 
 **Công nghệ chính:**
 - **Backend:** PHP 7/8 (procedural/OOP mix), MySQL (DB: `QuanLyThuVien`).
